@@ -128,9 +128,45 @@ pub fn load_fleet(path: &str) -> Vec<ShipSpec> {
 // rows of SIZE characters: '.' is water, 'S' is a ship. Blank lines and lines
 // starting with '#' are ignored. Return None for too few rows, too many rows,
 // a row of the wrong width, or any other character.
-// Start from board::new_board() and fill in board[row][col].
-pub fn parse_board(_text: &str) -> Option<Board> {
-    todo!("Task 3: parse_board")
+// Start from board::new_board() and fill in board[row][col].pub fn parse_board(_text: &str) -> Option<Board> {
+pub fn parse_board(text: &str) -> Option<crate::board::Board> {
+    let mut board = crate::board::new_board();
+    let mut row_count = 0;
+
+    for line in text.lines() {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+
+        if row_count >= crate::board::SIZE {
+            return None;
+        }
+
+        let chars: Vec<char> = line.chars().collect();
+        if chars.len() != crate::board::SIZE {
+            return None;
+        }
+
+        for col in 0..crate::board::SIZE {
+            let c = chars[col];
+            
+            let cell = match c {
+                '.' => crate::board::Cell::Water,
+                'S' | 's' => crate::board::Cell::Ship,
+                _ => return None,
+            };
+
+            board[row_count][col] = cell;
+        }
+
+        row_count += 1;
+    }
+
+    if row_count != crate::board::SIZE {
+        return None;
+    }
+
+    Some(board)
 }
 
 // Task 4.
