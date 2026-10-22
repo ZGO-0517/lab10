@@ -91,8 +91,36 @@ pub fn parse_ship_line(line: &str) -> Option<ShipSpec> {
 //     Skipped N invalid line(s) in <path>
 // to stderr (eprintln!). If the file cannot be read, print the error to
 // stderr and return an empty Vec.
-pub fn load_fleet(_path: &str) -> Vec<ShipSpec> {
-    todo!("Task 2: load_fleet")
+pub fn load_fleet(path: &str) -> Vec<ShipSpec> {
+    match std::fs::read_to_string(path) {
+        Ok(content) => {
+            let mut valid_ships = Vec::new();
+            let mut rejected_count = 0;
+
+            for line in content.lines() {
+                let trimmed = line.trim();
+                
+                if trimmed.is_empty() || trimmed.starts_with('#') {
+                    continue;
+                }
+
+                match parse_ship_line(line) {
+                    Some(ship) => valid_ships.push(ship),
+                    None => rejected_count += 1,
+                }
+            }
+
+            if rejected_count > 0 {
+                eprintln!("Skipped {} invalid line(s) in {}", rejected_count, path);
+            }
+
+            valid_ships
+        }
+        Err(error) => {
+            eprintln!("{}", error);
+            Vec::new()
+        }
+    }
 }
 
 // Task 3.
