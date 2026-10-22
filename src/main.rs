@@ -37,12 +37,22 @@ fn main() {
 
 // Print the best scores, highest first, or a message if there are none.
 fn show_top_scores(n: usize) {
-    // TODO (Task 9): load the scores; print "TOP n"; if there are none print
-    // "  no scores yet"; otherwise sort with data::sort_scores_desc and print up
-    // to n lines like
-    //  1. Ana              83
-    println!("TOP {n}");
-    println!("  (high scores are not shown yet)");
+    let mut records = data::load_scores(SCORES_PATH);
+    println!("TOP {}", n);
+
+    if records.is_empty() {
+        println!("  no scores yet");
+        return;
+    }
+
+    data::sort_scores_desc(&mut records);
+
+    let limit = std::cmp::min(n, records.len());
+
+    for i in 0..limit {
+        let record = &records[i];
+        println!("{:>2}. {:<15} {:>4}", i + 1, record.name, record.score);
+    }
 }
 
 // A scored game against a randomly placed fleet.
