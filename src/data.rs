@@ -195,8 +195,25 @@ pub fn load_board(path: &str) -> Option<Board> {
 // Replace commas in the name with spaces so the line stays parseable.
 // Return true if the write succeeded; on failure print the error to stderr
 // and return false.
-pub fn append_score(_path: &str, _record: &ScoreRecord) -> bool {
-    todo!("Task 6: append_score")
+pub fn append_score(path: &str, record: &ScoreRecord) -> bool {
+    use std::fs::OpenOptions;
+    use std::io::Write;
+
+    let safe_name = record.name.replace(',', " ");
+
+    let mut file = match OpenOptions::new().create(true).append(true).open(path) {
+        Ok(f) => f,
+        Err(error) => {
+            eprintln!("{}", error);
+            return false;
+        }
+    };
+
+    if let Err(error) = writeln!(file, "{},{}", safe_name, record.score) {
+        eprintln!("{}", error);
+        return false;
+    }
+    true
 }
 
 // Task 7.
